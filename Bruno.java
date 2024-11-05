@@ -11,7 +11,7 @@ public class Bruno implements WheelOfFortunePlayer {
 
     @Override
     public String playerId() {
-        return "RandomGuesser";
+        return "Bruno";
     }
 
     @Override

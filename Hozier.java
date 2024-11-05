@@ -11,7 +11,7 @@ public class Hozier implements WheelOfFortunePlayer {
 
     @Override
     public String playerId() {
-        return "RandomGuesser";
+        return "Hozier";
     }
 
     @Override

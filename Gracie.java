@@ -11,7 +11,7 @@ public class Gracie implements WheelOfFortunePlayer {
 
     @Override
     public String playerId() {
-        return "RandomGuesser";
+        return "Gracie";
     }
 
     @Override

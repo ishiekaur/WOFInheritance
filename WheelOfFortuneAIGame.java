@@ -1,35 +1,65 @@
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WheelOfFortuneAIGame extends WheelOfFortune {
     private List<WheelOfFortunePlayer> players;
+    private List<String> phrases;
 
     public WheelOfFortuneAIGame(List<WheelOfFortunePlayer> players) {
         this.players = players;
+        this.phrases = loadPhrases("WOFPhrases.txt");  // Load phrases from file
+    }
+
+    // Load phrases from file into a list
+    private List<String> loadPhrases(String fileName) {
+        List<String> phrases = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                phrases.add(line.trim());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return phrases;
     }
 
     @Override
     protected GameRecord play() {
-        System.out.println("Playing Wheel of Fortune with AI...");
-        int score = 0;  // Placeholder for AI scoring logic
-        String playerId = players.get(0).playerId();  // Example of getting player ID
-        return new GameRecord(score, playerId);
+        return null;  // Placeholder: not directly called
+    }
+
+    protected GameRecord play(WheelOfFortunePlayer player, String phrase) {
+        System.out.println("Playing Wheel of Fortune with AI player: " + player.playerId() + " on phrase: " + phrase);
+        int score = (int) (Math.random() * 100);  // Placeholder for AI scoring logic
+        return new GameRecord(score, player.playerId());
     }
 
     @Override
     protected boolean playNext() {
-        // Decide when to play next based on AI logic
-        return false;  // Placeholder
+        return false;  // Placeholder logic
     }
 
     @Override
     protected char getGuess(String previousGuesses) {
-        // Placeholder to get a guess from an AI player
         return 'e';  // Example guess
     }
 
+    // Play games for all players across all phrases
+    public AllGamesRecord playAll() {
+        AllGamesRecord allRecords = new AllGamesRecord();
+        for (WheelOfFortunePlayer player : players) {
+            for (String phrase : phrases) {
+                GameRecord record = play(player, phrase);  // Play each phrase for each player
+                allRecords.add(record);
+            }
+        }
+        return allRecords;
+    }
+
     public static void main(String[] args) {
-        // Example list of AI players (implementations not shown here)
-        List<WheelOfFortunePlayer> aiPlayers = List.of(new RandomGuesser(), new DictionaryGuesser(), new OpenAIGuesser());
+        List<WheelOfFortunePlayer> aiPlayers = List.of(new Gracie(), new Hozier(), new Bruno());
         WheelOfFortuneAIGame game = new WheelOfFortuneAIGame(aiPlayers);
         AllGamesRecord record = game.playAll();
         System.out.println(record);

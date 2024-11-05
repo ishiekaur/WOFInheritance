@@ -1,52 +1,28 @@
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
 
 public class WheelOfFortuneUserGame extends WheelOfFortune {
     private Scanner scanner = new Scanner(System.in);
     private String phrase;
     private StringBuilder hiddenPhrase;
-    private String previousGuesses = "";
+    private List<Character> guessedLetters = new ArrayList<>();
     private int maxIncorrectGuesses = 5;
     private int remainingGuesses;
     private boolean firstGame = true;
 
-    // Constructor to initialize game and load phrases from file
     public WheelOfFortuneUserGame() {
         super();
-        resetGame(); // Initialize game settings
+        resetGame();
     }
 
-    // Method to reset the game for a new round
     private void resetGame() {
-        previousGuesses = ""; // Clear previous guesses
-        remainingGuesses = maxIncorrectGuesses; // Reset guesses
-
-        try {
-            List<String> phrases = Files.readAllLines(Paths.get("WOFPhrases.txt"));
-            this.phrase = getRandomPhrase(phrases).toLowerCase(); // Get a new random phrase
-            this.hiddenPhrase = generateHiddenPhrase(phrase);      // Generate hidden version
-        } catch (IOException e) {
-            System.err.println("Error reading phrases file: " + e.getMessage());
+        guessedLetters.clear();
+        remainingGuesses = maxIncorrectGuesses;
+        phrase = randomPhrase();
+        if (phrase != null) {
+            hiddenPhrase = new StringBuilder(getHiddenPhrase(phrase, guessedLetters));
         }
-    }
-
-    // Randomly select a phrase from the list
-    private String getRandomPhrase(List<String> phrases) {
-        Random random = new Random();
-        return phrases.get(random.nextInt(phrases.size()));
-    }
-
-    // Generate the hidden phrase (replacing letters with *)
-    private StringBuilder generateHiddenPhrase(String phrase) {
-        StringBuilder hidden = new StringBuilder();
-        for (char c : phrase.toCharArray()) {
-            hidden.append(Character.isLetter(c) ? '*' : c);
-        }
-        return hidden;
     }
 
     @Override
@@ -55,10 +31,10 @@ public class WheelOfFortuneUserGame extends WheelOfFortune {
         System.out.println("Try to guess the phrase: " + hiddenPhrase);
 
         while (remainingGuesses > 0 && hiddenPhrase.toString().contains("*")) {
-            char guess = getGuess(previousGuesses);
-            previousGuesses += guess;
+            char guess = getGuess(previousGuesses());
+            guessedLetters.add(guess);
 
-            if (processGuess(guess)) {
+            if (processGuess(guess, phrase, hiddenPhrase)) {
                 System.out.println("Good guess! The phrase now: " + hiddenPhrase);
             } else {
                 remainingGuesses--;
@@ -72,50 +48,45 @@ public class WheelOfFortuneUserGame extends WheelOfFortune {
             System.out.println("Congratulations! You guessed the phrase: " + phrase);
         }
 
-        int score = remainingGuesses * 10; // Example scoring logic based on remaining guesses
+        int score = remainingGuesses * 10;
         return new GameRecord(score, "User");
+    }
+
+    private String previousGuesses() {
+        StringBuilder previous = new StringBuilder();
+        for (char guess : guessedLetters) {
+            previous.append(guess);
+        }
+        return previous.toString();
     }
 
     @Override
     protected boolean playNext() {
         if (firstGame) {
-            firstGame = false; // Skip prompt for the first game
+            firstGame = false;
             return true;
         } else {
-            System.out.println("Play another game? (y/n): ");
+            System.out.print("Play another game? (y/n): ");
             boolean playAgain = scanner.nextLine().trim().equalsIgnoreCase("y");
-            if (playAgain) {
-                resetGame(); // Reset game state for a new round
+            if (playAgain && !phrases.isEmpty()) {
+                resetGame();
             }
-            return playAgain;
+            return playAgain && !phrases.isEmpty();
         }
     }
 
     @Override
     protected char getGuess(String previousGuesses) {
-        System.out.println("Enter your guess: ");
+        System.out.print("Enter your guess: ");
         String guessInput = scanner.nextLine().trim().toLowerCase();
 
-        // Validate the input to ensure it’s a single letter
         while (guessInput.length() != 1 || !Character.isLetter(guessInput.charAt(0)) || previousGuesses.contains(guessInput)) {
-            System.out.println("Invalid input or letter already guessed. Try again:");
+            System.out.print("Invalid input or letter already guessed. Try again: ");
             guessInput = scanner.nextLine().trim().toLowerCase();
         }
 
         return guessInput.charAt(0);
     }
-
-    // Process the guess by updating the hidden phrase
-        protected boolean processGuess(char guess) {
-            boolean found = false;
-            for (int i = 0; i < phrase.length(); i++) {
-                if (phrase.charAt(i) == guess) {
-                    hiddenPhrase.setCharAt(i, guess);
-                    found = true;
-                }
-            }
-            return found;
-        }
 
     public static void main(String[] args) {
         boolean playAgain;
