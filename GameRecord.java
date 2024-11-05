@@ -22,6 +22,6 @@ public class GameRecord implements Comparable<GameRecord> {
 
     @Override
     public String toString() {
-        return "Player: " + playerId + ", Score: " + score;
+        return "Player ID: " + playerId + ", Score: " + score;
     }
 }

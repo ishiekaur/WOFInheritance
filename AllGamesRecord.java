@@ -1,44 +1,36 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class AllGamesRecord {
-    private List<GameRecord> records;
+    private List<GameRecord> gameRecords;
 
     public AllGamesRecord() {
-        this.records = new ArrayList<>();
+        this.gameRecords = new ArrayList<>();
     }
 
     public void add(GameRecord record) {
-        records.add(record);
+        gameRecords.add(record);
     }
 
     public double average() {
-        return records.stream().mapToInt(GameRecord::getScore).average().orElse(0.0);
-    }
-
-    public double average(String playerId) {
-        return records.stream()
-                      .filter(record -> record.getPlayerId().equals(playerId))
-                      .mapToInt(GameRecord::getScore)
-                      .average()
-                      .orElse(0.0);
-    }
-
-    public List<GameRecord> highGameList(int n) {
-        List<GameRecord> sortedRecords = new ArrayList<>(records);
-        sortedRecords.sort(Collections.reverseOrder());
-        return sortedRecords.subList(0, Math.min(n, sortedRecords.size()));
-    }
-
-    public List<GameRecord> highGameList(String playerId, int n) {
-        List<GameRecord> playerRecords = new ArrayList<>();
-        for (GameRecord record : records) {
-            if (record.getPlayerId().equals(playerId)) {
-                playerRecords.add(record);
-            }
+        if (gameRecords.isEmpty()) {
+            return 0;
         }
-        playerRecords.sort(Collections.reverseOrder());
-        return playerRecords.subList(0, Math.min(n, playerRecords.size()));
+        double sum = 0;
+        for (GameRecord record : gameRecords) {
+            sum += record.getScore();
+        }
+        return sum / gameRecords.size();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("All Games Record:\n");
+        for (GameRecord record : gameRecords) {
+            sb.append(record.toString()).append("\n");
+        }
+        sb.append("Average Score: ").append(average()).append("\n");
+        return sb.toString();
     }
 }
