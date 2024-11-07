@@ -89,12 +89,8 @@ public class WheelOfFortuneUserGame extends WheelOfFortune {
     }
 
     public static void main(String[] args) {
-        boolean playAgain;
-        do {
             WheelOfFortuneUserGame game = new WheelOfFortuneUserGame();
             AllGamesRecord record = game.playAll();
             System.out.println(record);
-            playAgain = game.playNext();
-        } while (playAgain);
     }
 }
