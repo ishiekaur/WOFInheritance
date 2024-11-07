@@ -1,12 +1,15 @@
-import java.util.Random;
-
 public class Hozier implements WheelOfFortunePlayer {
-    private Random random = new Random();
+    private char currentGuess = 'a'; // Start guessing from 'a'
 
     @Override
     public char nextGuess() {
-        // Generate a random letter from 'a' to 'z'
-        return (char) ('a' + random.nextInt(26));
+        // If we have reached 'z', reset to 'a'
+        if (currentGuess > 'z') {
+            currentGuess = 'a';
+        }
+        
+        // Return the current letter and then increment it for the next guess
+        return currentGuess++;
     }
 
     @Override
@@ -16,7 +19,7 @@ public class Hozier implements WheelOfFortunePlayer {
 
     @Override
     public void reset() {
-        // No reset state needed for RandomGuesser
+        // Reset the guesser back to 'a' when reset is called
+        currentGuess = 'a';
     }
 }
-
